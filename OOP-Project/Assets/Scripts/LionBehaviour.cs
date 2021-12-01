@@ -16,5 +16,12 @@ public class LionBehaviour : AnimalBehaviour
         Debug.Log("Lion: Collided with: " + collision.gameObject.name);
         Debug.Log("Lion: Base class, what do you say?");
         base.ReactToCollision(collision);
+        if (collision.gameObject.CompareTag("Flower"))
+        {
+            //Because I believe lions jump when they eat flowers(?)
+            base.animalAnimator.SetTrigger("jump");
+            base.animalRb.AddForce(Vector3.up * 10, ForceMode.Impulse);
+        }
+        
     }
 }

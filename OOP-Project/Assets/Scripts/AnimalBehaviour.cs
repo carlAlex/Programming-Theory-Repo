@@ -9,10 +9,12 @@ public abstract class AnimalBehaviour : MonoBehaviour
     public GameObject target;
 
     protected Animator animalAnimator;
+    protected Rigidbody animalRb;
 
     // Start is called before the first frame update
     void Start()
     {
+        animalRb = GetComponent<Rigidbody>();
         animalAnimator = GetComponent<Animator>();
         animalAnimator.SetInteger("Walk", 1);
         //target = GameObject.Find("Flower");
