@@ -27,6 +27,7 @@ public class FlowerSpawner : MonoBehaviour
         }
     }
 
+    //ABSTRACTION
     private void SpawnFlower()
     {
         Vector3 spawnPos = new Vector3(

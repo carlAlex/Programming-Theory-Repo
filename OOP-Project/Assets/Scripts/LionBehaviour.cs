@@ -2,8 +2,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+//INHERITANCE
 public class LionBehaviour : AnimalBehaviour
 {
+    //POLYMORPHISM
     protected override void Speak()
     {
         Debug.Log("Roar! I found a flower..");

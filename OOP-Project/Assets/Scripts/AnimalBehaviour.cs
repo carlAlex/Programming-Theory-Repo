@@ -33,6 +33,7 @@ public abstract class AnimalBehaviour : MonoBehaviour
         }
     }
 
+    //ABSTRACTION
     private void SetTargetFlower()
     {
         GameObject[] flowerArray = GameObject.FindGameObjectsWithTag("Flower");
@@ -50,7 +51,8 @@ public abstract class AnimalBehaviour : MonoBehaviour
         }
     }
 
-    //POLYMORPHISM
+    //POLYMORPHISM (preparation for children)
+    //ABSTRACTION
     //Virtual method - Children should provide appropriate response depending on type
     protected virtual void ReactToCollision(Collision collision)
     {
