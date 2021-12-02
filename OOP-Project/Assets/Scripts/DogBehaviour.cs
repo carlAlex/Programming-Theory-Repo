@@ -14,7 +14,5 @@ public class DogBehaviour : AnimalBehaviour
     protected override void ReactToCollision(Collision collision)
     {
         Debug.Log("Dog: Collided with: " + collision.gameObject.name);
-        Debug.Log("Dog: Base class, what do you say?");
-        base.ReactToCollision(collision);
     }
 }

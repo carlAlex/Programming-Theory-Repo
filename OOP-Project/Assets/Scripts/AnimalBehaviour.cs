@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 
 //INHERITANCE - Abstract BaseClass for type of behaviour
 public abstract class AnimalBehaviour : MonoBehaviour
@@ -11,35 +12,33 @@ public abstract class AnimalBehaviour : MonoBehaviour
     protected Animator animalAnimator;
     protected Rigidbody animalRb;
 
+    private NavMeshAgent agent;
+
     // Start is called before the first frame update
-    void Start()
+    protected virtual void Start()
     {
         animalRb = GetComponent<Rigidbody>();
         animalAnimator = GetComponent<Animator>();
         animalAnimator.SetInteger("Walk", 1);
-        //target = GameObject.Find("Flower");
-        SetTargetFlower();
+        agent = GetComponent<NavMeshAgent>();
+        SetTarget();
     }
 
     // Update is called once per frame
-    void Update()
+    protected virtual void Update()
     {
         if (target == null)
         {
-            SetTargetFlower();
-        }
-        else
-        {
-            transform.LookAt(target.transform);
-            transform.Translate(Vector3.forward * moveSpeed * Time.deltaTime);
+            SetTarget();
         }
     }
 
     //ABSTRACTION
-    private void SetTargetFlower()
+    protected virtual void SetTarget()
     {
         GameObject[] flowerArray = GameObject.FindGameObjectsWithTag("Flower");
         target = flowerArray[Random.Range(0, flowerArray.Length)];
+        agent.SetDestination(target.transform.position);
     }
 
     private void OnCollisionEnter(Collision collision)
@@ -49,7 +48,7 @@ public abstract class AnimalBehaviour : MonoBehaviour
         {
             Destroy(collision.gameObject);
             GameManager.Instance.NumberFlowers--;
-            SetTargetFlower();
+            SetTarget();
         }
     }
 
