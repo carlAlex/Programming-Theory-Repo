@@ -7,6 +7,7 @@ public class FlowerSpawner : MonoBehaviour
     public GameObject flower;
     private float spawnX = 250f;
     private float spawnZ = 250f;
+    [SerializeField]
     private float spawnRange = 20.0f;
 
     // Start is called before the first frame update

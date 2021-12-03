@@ -20,6 +20,5 @@ public class LionBehaviour : AnimalBehaviour
             base.animalAnimator.SetTrigger("jump");
             base.animalRb.AddForce(Vector3.up * 10, ForceMode.Impulse);
         }
-        
     }
 }
