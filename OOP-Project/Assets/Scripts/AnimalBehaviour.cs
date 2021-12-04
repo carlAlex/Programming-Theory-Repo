@@ -13,7 +13,7 @@ public abstract class AnimalBehaviour : MonoBehaviour
     protected Animator animalAnimator;
     protected Rigidbody animalRb;
 
-    private NavMeshAgent agent;
+    public NavMeshAgent agent;
 
     //Find food
     private float spawnX = 250f;
@@ -30,7 +30,7 @@ public abstract class AnimalBehaviour : MonoBehaviour
         animalAnimator = GetComponent<Animator>();
         animalAnimator.SetInteger("Walk", 1);
         agent = GetComponent<NavMeshAgent>();
-        LookForTarget();
+        //LookForTarget();
         switch (gameObject.name)
         {
             case "Chicken":
@@ -56,37 +56,87 @@ public abstract class AnimalBehaviour : MonoBehaviour
     // Update is called once per frame
     protected virtual void Update()
     {
-        //NEW LOGIC
-
-
-        //OLD LOGIC
-        if (targetGameObj == null)
+        if (targetGameObj == null || AgentReachedTarget())
         {
-            Transform target = LookForTarget();
+            Transform target = FindTarget();
+            //A target has to be withing the animals "sensors" to be noticed
             if (target != null)
             {
                 SetTargetFlower(target);
             }
+            else
+            {
+                //No visible flowers!
+                if (!agent.hasPath && !agent.pathPending)
+                {
+                    Debug.Log(gameObject.name + " setting random destination..");
+                    SetRandomDestinationToSearch();
+                }
+            }
         }
     }
 
-    private void FindTarget()
+    private bool AgentReachedTarget()
     {
-
+        //Is a path in the process of being computed but not yet ready?
+        if (!agent.pathPending)
+        {
+            //The distance between the agent's position and the destination on the current path.
+            //Stop within this distance from the target position.
+            if (agent.remainingDistance <= agent.stoppingDistance)
+            {
+                //Does the agent currently have a path?
+                //..current velocity of the NavMeshAgent..
+                if (!agent.hasPath || agent.velocity.sqrMagnitude == 0f)
+                {
+                    // Done
+                    return true;
+                }
+                else { return false; }
+            }
+            else
+            {
+                //Agent is navigating with "long" remainingDistance
+                return false;
+            }
+        }
+        else
+        {
+            //Agent has pathPending, lets wait for that..
+            return false;
+        }
     }
 
-    //ABSTRACTION
-    protected virtual Transform LookForTarget()
+    private Transform FindTarget()
     {
         GameObject[] flowerArray = GameObject.FindGameObjectsWithTag("Flower");
-        //target = flowerArray[Random.Range(0, flowerArray.Length)];
-        //agent.SetDestination(target.transform.position);
-        //float smallestAngle = 360f;
         int targetFlower = 0;
         bool targetFound = false;
 
-        //Debug.Log(gameObject.name + " looking for flower..");
+        FindVisibleFlower(flowerArray, ref targetFlower, ref targetFound);
 
+        if (targetFound)
+        {
+            targetGameObj = flowerArray[targetFlower];
+            return flowerArray[targetFlower].transform;
+        }
+        else
+        {
+            return null;
+        }
+    }
+
+    private void SetRandomDestinationToSearch()
+    {
+        Vector3 searchPos = new Vector3(
+                        Random.Range(spawnX - spawnRange, spawnX + spawnRange),
+                        0,
+                        Random.Range(spawnZ - spawnRange, spawnZ + spawnRange));
+        agent.SetDestination(searchPos);
+    }
+
+    private void FindVisibleFlower(GameObject[] flowerArray, ref int targetFlower, ref bool targetFound)
+    {
         for (int i = 0; i < flowerArray.Length; i++)
         {
             Vector3 flower = flowerArray[i].transform.position;
@@ -98,42 +148,9 @@ public abstract class AnimalBehaviour : MonoBehaviour
             {
                 targetFlower = i;
                 targetFound = true;
-                Debug.Log(gameObject.name + " found flower! Angle: " + angle + " Dist: " + dist);
+                //Debug.Log(gameObject.name + " found flower! Angle: " + angle + " Dist: " + dist);
             }
         }
-        if (targetFound)
-        {
-            targetGameObj = flowerArray[targetFlower];
-            searchMode = false;
-            return flowerArray[targetFlower].transform;
-        }
-        else
-        {
-            //Debug.Log(gameObject.name + " could not find flower..");
-            if (!searchMode)
-            {
-                Vector3 searchPos = new Vector3(
-                Random.Range(spawnX - spawnRange, spawnX + spawnRange),
-                0,
-                Random.Range(spawnZ - spawnRange, spawnZ + spawnRange));
-                agent.SetDestination(searchPos);
-                searchMode = true;
-                //Debug.Log(gameObject.name + " setting new search point..");
-            } else
-            {
-                if (Vector3.Distance(agent.destination, transform.position) < 0.5f)
-                {
-                    //Debug.Log(gameObject.name + " nothing here..");
-                    searchMode = false;
-                }
-            }
-            
-            return null;
-        }
-        
-        //Debug.Log("SetDest - Angle: " + smallestAngle + " Flower: " + targetFlower);
-        //SetTargetFlower(flowerArray, targetFlower, targetFound);
-
     }
 
     private void SetTargetFlower(Transform target)
@@ -148,7 +165,7 @@ public abstract class AnimalBehaviour : MonoBehaviour
         {
             Destroy(collision.gameObject);
             GameManager.Instance.NumberFlowers--;
-            LookForTarget();
+            //LookForTarget();
         }
     }
 
