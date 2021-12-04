@@ -7,7 +7,7 @@ using UnityEngine.AI;
 public abstract class AnimalBehaviour : MonoBehaviour
 {
     public float moveSpeed = 3.0f;
-    public GameObject target;
+    public GameObject targetGameObj;
 
     //Protected so Lion can do some different stuff
     protected Animator animalAnimator;
@@ -19,8 +19,9 @@ public abstract class AnimalBehaviour : MonoBehaviour
     private float spawnX = 250f;
     private float spawnZ = 250f;
     private float spawnRange = 40.0f;
+    [SerializeField]
     private bool searchMode = false;
-    private IFoodFinder foodFinder = new ChickenSensors();
+    private IFoodFinder foodFinder;
 
     // Start is called before the first frame update
     protected virtual void Start()
@@ -30,12 +31,36 @@ public abstract class AnimalBehaviour : MonoBehaviour
         animalAnimator.SetInteger("Walk", 1);
         agent = GetComponent<NavMeshAgent>();
         LookForTarget();
+        switch (gameObject.name)
+        {
+            case "Chicken":
+                foodFinder = new ChickenSensors();
+                break;
+            case "Penguin":
+                foodFinder = new PenguinSensors();
+                break;
+            case "Lion":
+                foodFinder = new LionSensors();
+                break;
+            case "Dog":
+                foodFinder = new DogSensors();
+                break;
+            case "Cat":
+                foodFinder = new CatSensors();
+                break;
+            default:
+                break;
+        }
     }
 
     // Update is called once per frame
     protected virtual void Update()
     {
-        if (target == null)
+        //NEW LOGIC
+
+
+        //OLD LOGIC
+        if (targetGameObj == null)
         {
             Transform target = LookForTarget();
             if (target != null)
@@ -43,6 +68,11 @@ public abstract class AnimalBehaviour : MonoBehaviour
                 SetTargetFlower(target);
             }
         }
+    }
+
+    private void FindTarget()
+    {
+
     }
 
     //ABSTRACTION
@@ -55,33 +85,31 @@ public abstract class AnimalBehaviour : MonoBehaviour
         int targetFlower = 0;
         bool targetFound = false;
 
-        Debug.Log(gameObject.name + " looking for flower..");
+        //Debug.Log(gameObject.name + " looking for flower..");
 
         for (int i = 0; i < flowerArray.Length; i++)
         {
             Vector3 flower = flowerArray[i].transform.position;
             Vector3 targetDir = flower - transform.position;
             float angle = Vector3.Angle(targetDir, transform.forward);
-            if (angle < 30)
+            float dist = Vector3.Distance(flower, transform.position);
+            //Make use of IFoodFinder interface
+            if (foodFinder.ValidateParameters(angle, dist))
             {
-                if (Vector3.Distance(flower, transform.position) < 20)
-                {
-                    targetFlower = i;
-                    targetFound = true;
-                    Debug.Log(gameObject.name + " found flower!");
-                }
-                //smallestAngle = angle;
+                targetFlower = i;
+                targetFound = true;
+                Debug.Log(gameObject.name + " found flower! Angle: " + angle + " Dist: " + dist);
             }
         }
         if (targetFound)
         {
-            target = flowerArray[targetFlower];
+            targetGameObj = flowerArray[targetFlower];
             searchMode = false;
             return flowerArray[targetFlower].transform;
         }
         else
         {
-            Debug.Log(gameObject.name + " could not find flower..");
+            //Debug.Log(gameObject.name + " could not find flower..");
             if (!searchMode)
             {
                 Vector3 searchPos = new Vector3(
@@ -90,12 +118,12 @@ public abstract class AnimalBehaviour : MonoBehaviour
                 Random.Range(spawnZ - spawnRange, spawnZ + spawnRange));
                 agent.SetDestination(searchPos);
                 searchMode = true;
-                Debug.Log(gameObject.name + " setting new search point..");
+                //Debug.Log(gameObject.name + " setting new search point..");
             } else
             {
                 if (Vector3.Distance(agent.destination, transform.position) < 0.5f)
                 {
-                    Debug.Log(gameObject.name + " nothing here..");
+                    //Debug.Log(gameObject.name + " nothing here..");
                     searchMode = false;
                 }
             }

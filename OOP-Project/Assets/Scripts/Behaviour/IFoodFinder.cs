@@ -4,5 +4,5 @@ using UnityEngine;
 
 public interface IFoodFinder
 {
-    void SearchForFood();
+    bool ValidateParameters(float angle, float distance);
 }
