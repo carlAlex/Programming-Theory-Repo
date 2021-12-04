@@ -13,6 +13,7 @@ public class UIManager : MonoBehaviour
     public Text remainDist;
     public Text velocity;
     public Text destination;
+    public Text location;
 
     Ray ray;
     RaycastHit hit;
@@ -31,8 +32,12 @@ public class UIManager : MonoBehaviour
             ray = Camera.main.ScreenPointToRay(Input.mousePosition);
             if (Physics.Raycast(ray, out hit))
             {
-                animal = hit.collider.gameObject;
-                Debug.Log("Raycast hit: " + hit.collider.name);
+                if (hit.collider.gameObject.CompareTag("Animal"))
+                {
+                    animal = hit.collider.gameObject;
+                    Debug.Log("Raycast hit: " + hit.collider.name);
+                }
+                Debug.Log("Hit " + hit.collider.gameObject.name);
             }
         }
 
@@ -50,8 +55,9 @@ public class UIManager : MonoBehaviour
             hasPath.text = "HasPath: " + ab.agent.hasPath.ToString();
             pathPending.text = "PathPending: " + ab.agent.pathPending.ToString();
             remainDist.text = "RemDist: " + ab.agent.remainingDistance.ToString();
-            velocity.text = "Velocity: " + ab.agent.velocity.ToString();
+            velocity.text = "Velocity: " + ab.agent.velocity.sqrMagnitude.ToString();
             destination.text = "Destination: " + ab.agent.destination.ToString();
+            location.text = "Location: " + animal.transform.position.ToString();
         }
         
     }

@@ -13,6 +13,6 @@ public class ChickenBehaviour : AnimalBehaviour
 
     protected override void ReactToCollision(Collision collision)
     {
-        Debug.Log("Chicken: Collided with: " + collision.gameObject.name);
+        //Debug.Log("Chicken: Collided with: " + collision.gameObject.name);
     }
 }

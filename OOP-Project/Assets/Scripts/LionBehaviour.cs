@@ -13,7 +13,7 @@ public class LionBehaviour : AnimalBehaviour
 
     protected override void ReactToCollision(Collision collision)
     {
-        Debug.Log("Lion: Collided with: " + collision.gameObject.name);
+        //Debug.Log("Lion: Collided with: " + collision.gameObject.name);
         if (collision.gameObject.CompareTag("Flower"))
         {
             //Because I believe lions jump when they eat flowers(?)

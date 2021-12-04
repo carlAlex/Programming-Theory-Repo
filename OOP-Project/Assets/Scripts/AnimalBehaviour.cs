@@ -56,6 +56,11 @@ public abstract class AnimalBehaviour : MonoBehaviour
     // Update is called once per frame
     protected virtual void Update()
     {
+        if (!agent.isOnNavMesh)
+        {
+            Debug.Log(gameObject.name + " is not on navmesh!");
+        }
+
         if (targetGameObj == null || AgentReachedTarget())
         {
             Transform target = FindTarget();

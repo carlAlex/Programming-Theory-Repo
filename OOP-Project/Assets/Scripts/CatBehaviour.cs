@@ -13,6 +13,6 @@ public class CatBehaviour : AnimalBehaviour
 
     protected override void ReactToCollision(Collision collision)
     {
-        Debug.Log("Cat: Collided with: " + collision.gameObject.name);
+        //Debug.Log("Cat: Collided with: " + collision.gameObject.name);
     }
 }
